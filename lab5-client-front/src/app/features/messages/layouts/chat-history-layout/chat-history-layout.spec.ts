@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Dashboard } from './dashboard';
+import { ChatHistoryLayout } from './chat-history-layout';
 
-describe('Dashboard', () => {
-  let component: Dashboard;
-  let fixture: ComponentFixture<Dashboard>;
+describe('ChatHistoryLayout', () => {
+  let component: ChatHistoryLayout;
+  let fixture: ComponentFixture<ChatHistoryLayout>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Dashboard]
+      imports: [ChatHistoryLayout]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Dashboard);
+    fixture = TestBed.createComponent(ChatHistoryLayout);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
