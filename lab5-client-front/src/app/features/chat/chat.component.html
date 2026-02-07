@@ -1,0 +1,55 @@
+<div class="chat-container">
+
+  <aside class="user-list">
+    <div class="header">
+      <h3>Online</h3>
+    </div>
+
+    <ul>
+      <li [class.active]="!selectedUser" (click)="selectUser(null)">
+        <span class="status-dot broadcast"></span>
+        Todos (Broadcast)
+      </li>
+
+      <li *ngFor="let user of users"
+          [class.active]="selectedUser?.id === user.id"
+          (click)="selectUser(user)">
+        <span class="status-dot online"></span>
+        <div class="user-info">
+          <span class="name">{{ user.name }} (ID: {{user.id}})</span>
+        </div>
+      </li>
+    </ul>
+  </aside>
+
+  <main class="chat-area">
+    <div class="chat-header">
+      <h2>{{ getTargetName() }}</h2>
+    </div>
+
+    <div class="messages" id="chat-history">
+      <div *ngFor="let msg of messages"
+           class="message-bubble"
+           [ngClass]="{
+             'me': msg.senderId === myId,
+             'system': msg.senderId === '0'
+           }">
+
+        <small class="sender" *ngIf="msg.senderId !== myId">
+          {{ msg.senderId === '0' ? 'Servidor' : 'ID ' + msg.senderId }}
+        </small>
+
+        <div class="content">{{ msg.content }}</div>
+        <span class="time">{{ msg.timestamp | date:'shortTime' }}</span>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <input type="text"
+             [(ngModel)]="newMessage"
+             (keyup.enter)="sendMessage()"
+             placeholder="Digite sua mensagem...">
+      <button (click)="sendMessage()">Enviar</button>
+    </div>
+  </main>
+</div>
