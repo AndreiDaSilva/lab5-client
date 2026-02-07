@@ -4,7 +4,10 @@ import { MessageService } from '../services';
 
 @Injectable({ providedIn: 'root' })
 export class MessagesStore {
-  private readonly _messages = signal<Message[]>([]);
+  private readonly _messages = signal<Message[]>([
+    new Message({ senderId: 6201, receiverId: 1111, content: 'Oi! Tudo bem?' }),
+    new Message({ senderId: 1111, receiverId: 6201, content: 'Tudo certo! E contigo?' })
+  ]);
 
   readonly messages = this._messages.asReadonly();
 
@@ -12,13 +15,6 @@ export class MessagesStore {
     effect(() => {
       const lastMessage = this.messageService.lastMessage();
       if (!lastMessage) return;
-      const existent = this._messages().find(
-        (m) =>
-          m.content === lastMessage.content &&
-          m.senderId === lastMessage.senderId &&
-          m.receiverId === lastMessage.receiverId,
-      );
-      if (existent) return;
       this.addMessage(lastMessage);
     });
   }

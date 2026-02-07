@@ -1,1 +1,25 @@
-<p>chat-history-layout works!</p>
+<main class="main-container">
+  <aside class="chat-history glass-card">
+    <span class="chat-history__label">Usuários online</span>
+    <ul>
+      @for (user of users(); track user.id) {
+        <li>
+          <a class="chat-item" [class.active]="isActiveUser(user.id)" [routerLink]="[user.id]">
+            <div class="user-media">
+              <mat-icon>person</mat-icon>
+            </div>
+
+            <div class="user-info">
+              <span class="username">{{ user.name }}</span>
+              <span class="last-message">Última mensagem às</span>
+            </div>
+          </a>
+        </li>
+      }
+    </ul>
+  </aside>
+
+  <div class="chat-wrapper">
+    <router-outlet></router-outlet>
+  </div>
+</main>

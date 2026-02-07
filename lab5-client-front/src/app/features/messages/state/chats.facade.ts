@@ -1,4 +1,4 @@
-import { computed, DestroyRef, Injectable, signal } from '@angular/core';
+import { computed, DestroyRef, effect, Injectable, signal } from '@angular/core';
 import { UsersStore } from './users.store';
 import { MessagesStore } from './messages.store';
 import { AuthStore, UsersService } from 'core/auth';
@@ -10,6 +10,11 @@ import { Message } from '../models';
 export class ChatsFacade {
   private _activeUserId = signal<number | null>(null);
   private _inputContent = signal<string>('');
+
+  readonly activeUserId = this._activeUserId.asReadonly();
+  readonly inputContent = this._inputContent.asReadonly();
+
+  readonly isBroadcast = computed(() => this._activeUserId() === 0);
 
   readonly messageDraft = computed(() => ({
     senderId: this.authStore.user()?.id,
@@ -36,11 +41,15 @@ export class ChatsFacade {
     this.usersStore
       .loadUsersFrom(this.usersService.getOnlineUsers())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({});
+      .subscribe();
   }
 
   sendMessage(message: Message) {
     this.messageService.send(message);
     this._inputContent.set('');
+  }
+
+  setActiveUser(userId: number) {
+    this._activeUserId.set(userId);
   }
 }

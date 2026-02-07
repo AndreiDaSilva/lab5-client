@@ -1,0 +1,25 @@
+<div class="chat-container">
+  <div class="chat-header">
+    <div class="user-media">
+      <mat-icon>{{ header()?.icon }}</mat-icon>
+    </div>
+    <h3>{{ header()?.label }}</h3>
+  </div>
+
+  <div class="message-list">
+    @for (message of messages(); track message.clientId) {
+      <div class="message" [ngClass]="sentByMe(message) ? 'me' : 'user'">
+        {{ message.content }}
+      </div>
+    }
+
+    <div class="anchor" [style.height]="'6rem'"></div>
+  </div>
+
+  <div class="input-wrapper glass-card">
+    <textarea placeholder="Digite uma mensagem..."></textarea>
+    <button class="btn-filled">
+        <mat-icon>arrow_upward</mat-icon>
+    </button>
+  </div>
+</div>
