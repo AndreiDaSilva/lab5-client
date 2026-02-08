@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SingleSelect } from './single-select';
+import { PushNotification } from './push-notification';
 
-describe('SingleSelect', () => {
-  let component: SingleSelect;
-  let fixture: ComponentFixture<SingleSelect>;
+describe('PushNotification', () => {
+  let component: PushNotification;
+  let fixture: ComponentFixture<PushNotification>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SingleSelect]
+      imports: [PushNotification]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(SingleSelect);
+    fixture = TestBed.createComponent(PushNotification);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

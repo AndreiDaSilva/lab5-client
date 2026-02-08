@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SingleSelect } from './single-select/single-select';
+import { PushNotification } from './push-notification/push-notification';
 
 
 
@@ -8,10 +8,10 @@ import { SingleSelect } from './single-select/single-select';
   declarations: [],
   imports: [
     CommonModule,
-    SingleSelect
+    PushNotification
   ],
   exports: [
-    SingleSelect
+    PushNotification
   ]
 })
 export class SharedModule { }

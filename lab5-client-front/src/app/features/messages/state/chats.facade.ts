@@ -1,10 +1,8 @@
-import { computed, DestroyRef, effect, Injectable, signal } from '@angular/core';
-import { UsersStore } from './users.store';
+import { computed, Injectable, signal } from '@angular/core';
 import { MessagesStore } from './messages.store';
-import { AuthStore, UsersService } from 'core/auth';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MessageService } from '../services';
-import { Message } from '../models';
+import { AuthStore } from 'core/auth';
+import { ChatService } from '../services';
+import { Message, MessageCreate } from '../models';
 
 @Injectable()
 export class ChatsFacade {
@@ -16,11 +14,13 @@ export class ChatsFacade {
 
   readonly isBroadcast = computed(() => this._activeUserId() === 0);
 
-  readonly messageDraft = computed(() => ({
-    senderId: this.authStore.user()?.id,
-    targetId: this._activeUserId(),
-    content: this._inputContent(),
-  }));
+  readonly messageDraft = computed(
+    () =>
+      ({
+        receiverId: this._activeUserId() || 0,
+        content: this._inputContent() || '',
+      }) as MessageCreate,
+  );
   readonly activeChatMessages = computed(() => {
     const activeId = this._activeUserId();
     if (!activeId) return [];
@@ -31,25 +31,30 @@ export class ChatsFacade {
   });
 
   constructor(
-    private destroyRef: DestroyRef,
     private authStore: AuthStore,
-    private usersStore: UsersStore,
     private messagesStore: MessagesStore,
-    private usersService: UsersService,
-    private messageService: MessageService,
-  ) {
-    this.usersStore
-      .loadUsersFrom(this.usersService.getOnlineUsers())
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe();
-  }
+    private chatService: ChatService,
+  ) {}
 
-  sendMessage(message: Message) {
-    this.messageService.send(message);
+  sendMessage() {
+    if (!this._activeUserId() || !this._inputContent()) return;
+
+    const messageDraft: MessageCreate = { ...this.messageDraft() };
     this._inputContent.set('');
+
+    this.chatService.sendMessage(messageDraft).subscribe({
+      next: (message: Message) => {
+        this.messagesStore.addMessage(message);
+      },
+      error: (err) => console.error(err)
+    });
   }
 
   setActiveUser(userId: number) {
     this._activeUserId.set(userId);
+  }
+
+  setInputContent(content: string) {
+    this._inputContent.set(content);
   }
 }

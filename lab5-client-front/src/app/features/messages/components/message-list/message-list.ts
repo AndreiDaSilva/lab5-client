@@ -1,45 +1,88 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed } from '@angular/core';
+import { Component, computed, effect, ElementRef, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute } from '@angular/router';
 import { Message } from '../../models';
 import { ChatsFacade, UsersStore } from '../../state';
 import { map } from 'rxjs';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AuthStore } from 'core/auth';
+import { BROADCAST_CHAT } from 'features/messages/constants';
+import { UserMedia } from '../user-media/user-media';
 
 interface HeaderValue {
   icon: string;
   label: string;
+  offline: boolean | null;
 }
 
 @Component({
   selector: 'app-message-list',
-  imports: [MatIconModule, CommonModule],
+  imports: [MatIconModule, CommonModule, FormsModule, ReactiveFormsModule, UserMedia],
   templateUrl: './message-list.html',
   styleUrl: './message-list.scss',
 })
 export class MessageList {
-  readonly messages = computed(() => this.facade.activeChatMessages());
+  @ViewChild('messageList') messageList?: ElementRef<HTMLDivElement>;
 
+  messageControl = new FormControl<string>('');
+
+  readonly messages = computed(() => this.facade.activeChatMessages());
   readonly header = computed(() => {
     const activeId = this.facade.activeUserId();
-    if (activeId == null) return;
+    if (activeId === null) return;
 
-    const icon = this.facade.isBroadcast() ? 'campaign' : 'person';
-    const label = this.facade.isBroadcast() ? 'Todos' : this.usersStore.getUser(activeId)?.name;
-    return { label, icon } as HeaderValue;
+    if (this.facade.isBroadcast()) return { ...BROADCAST_CHAT, offline: null };
+
+    const user = this.usersStore.getUser(activeId);
+    return {
+      label: user?.username || 'Usuário não encontrado',
+      icon: user ? 'person' : 'questionmark',
+      offline: user ? this.usersStore.isOffline(user) : null,
+    } as HeaderValue;
   });
 
   constructor(
     private route: ActivatedRoute,
     public facade: ChatsFacade,
     private usersStore: UsersStore,
-  ) {}
-
-  ngOnInit() {
-    this.route.paramMap.pipe(map((params) => params.get('userId'))).subscribe((userId) => {
-      this.facade.setActiveUser(Number(userId));
+    private authStore: AuthStore,
+  ) {
+    effect(() => {
+      const _ = this.facade.activeUserId();
+      this.scrollToBottom();
     });
+
+    effect(() => {
+      const inputContent = this.facade.inputContent();
+      this.messageControl.setValue(inputContent, { emitEvent: false });
+    });
+
+    this.messageControl.valueChanges.subscribe((value) => this.facade.setInputContent(value || ''));
   }
 
-  sentByMe = (message: Message) => message.senderId === 1111//this.authStore.user()?.id;
+  ngOnInit() {
+    this.route.paramMap.pipe(map((params) => params.get('userId'))).subscribe((userId) => 
+      this.facade.setActiveUser(Number(userId))
+    );
+  }
+
+  sentByMe = (message: Message) => message.senderId === this.authStore.user()?.id;
+
+  onSendMessage = () => {
+    this.facade.sendMessage();
+    this.scrollToBottom();
+  };
+
+  private scrollToBottom() {
+    setTimeout(() => {
+      const el = this.messageList?.nativeElement;
+      if (!el) return;
+
+      el.scrollTo({
+        top: el.scrollHeight,
+        behavior: 'smooth',
+      });
+    }, 100);
+  }
 }

@@ -1,7 +1,7 @@
 import { Component, effect, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AuthStore } from 'core/auth';
-import { MessageService } from 'features/messages/services';
+import { ChatService } from 'features/messages/services';
 
 @Component({
   selector: 'app-root',
@@ -14,12 +14,12 @@ export class App {
 
   constructor(
     private authStore: AuthStore,
-    private messageService: MessageService,
+    private chatService: ChatService,
   ) {
     effect(() => {
       const user = this.authStore.user();
-      if (!user || this.messageService.connectionOpened()) return;
-      this.messageService.connect();
+      if (!user || this.chatService.connectionOpened()) return;
+      this.chatService.connect();
     });
   }
 }

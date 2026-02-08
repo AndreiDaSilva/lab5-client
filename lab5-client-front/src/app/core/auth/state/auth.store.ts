@@ -9,7 +9,7 @@ export class AuthStore {
   readonly user = this._user.asReadonly();
   readonly loggedInAt = this._loggedInAt.asReadonly();
 
-  readonly isLoggedIn = computed(() => !!this._user() && !!this._loggedInAt());
+  readonly isLoggedIn = computed(() => this._user() !== null && this._loggedInAt() !== null);
 
   setCurrentUser(user: User) {
     this._user.set(user);

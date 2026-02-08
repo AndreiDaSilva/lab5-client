@@ -1,20 +1,17 @@
 import { effect, Injectable, signal } from '@angular/core';
 import { Message } from '../models';
-import { MessageService } from '../services';
+import { ChatService } from '../services';
 
 @Injectable({ providedIn: 'root' })
 export class MessagesStore {
-  private readonly _messages = signal<Message[]>([
-    new Message({ senderId: 6201, receiverId: 1111, content: 'Oi! Tudo bem?' }),
-    new Message({ senderId: 1111, receiverId: 6201, content: 'Tudo certo! E contigo?' })
-  ]);
+  private readonly _messages = signal<Message[]>([]);
 
   readonly messages = this._messages.asReadonly();
 
-  constructor(private messageService: MessageService) {
+  constructor(private chatService: ChatService) {
     effect(() => {
-      const lastMessage = this.messageService.lastMessage();
-      if (!lastMessage) return;
+      const lastMessage = this.chatService.lastMessage();
+      if (!lastMessage || lastMessage.senderId === -1) return;
       this.addMessage(lastMessage);
     });
   }

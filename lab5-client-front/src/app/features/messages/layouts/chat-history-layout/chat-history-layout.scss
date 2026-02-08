@@ -8,20 +8,42 @@ main {
 }
 
 .chat-history {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 20rem;
   height: 100%;
   padding: 12px;
+  padding-bottom: 72px;
 
   &__label {
     font-size: 12px;
     font-weight: 600;
     opacity: 0.8;
-    margin: 6px;
     letter-spacing: 2px;
     text-transform: uppercase;
   }
+
+  .empty-history {
+    color: var(--text-color-50);
+  }
+
+  .account {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    border-top: 1px solid var(--text-color-10);
+  }
+}
+
+.empty-history,
+.chat-history__label {
+  margin: 6px;
 }
 
 ul {
@@ -49,17 +71,6 @@ li {
 
 .chat-item.active {
   background: var(--text-color-10);
-}
-
-.user-media {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: var(--text-color);
-  background: var(--text-color-5);
-  border-radius: 50%;
-  height: 42px;
-  width: 42px;
 }
 
 .user-info {
